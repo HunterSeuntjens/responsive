@@ -47,9 +47,8 @@
 	  */
 	  let closerDistance = 150;
 
-	let dRuleId = null;
+	  let dRuleId = null;
 	  let cRuleId = null;
-		
 
 	  const ruleMap = {};
 
@@ -136,9 +135,9 @@
         const wsClient = Stomp.over(ws);		
         wsClient.debug = () => {};
         // for rvh - 
-		const topic = 'Screenfeed Demo';
-		const username = 'hunter@screenfeed.com';
-		const password = 'HotelSierra22!';
+		const topic = 'rvh';
+		const username = 'rvh_readonly';
+		const password = 'P2UK8P';
 		const channel = 'event.outputs'
 
         const on_connect = () => {
@@ -155,7 +154,7 @@
         const on_error =  (err) => {
             console.error('error' + err);
         };
-        wsClient.connect("hunter@screenfeed.com", "HotelSierra22!", on_connect, on_error, topic);
+        wsClient.connect(username, password, on_connect, on_error, topic);
 
 		/*
 			* We check for the updates in the object identification status in every one second.
@@ -167,15 +166,12 @@
 </head>
 <body onload="init();">
 	<!-- The below video plays indefenitely if no customer is detected. -->
- <video id="loopback-video" width="100%" height="100%" autoplay muted loop>
-	<source src="./Step1_wireframe.mp4" type="video/mp4"> >!
+<video id="loopback-video" width="100%" height="100%" autoplay muted loop>
+	<source src="./resources/Default_Attract_Loop.mp4" type="video/mp4">
 </video>
-	<video id="customer-detected" width="100%" height="100%" autoplay muted loop>
-	<source src="./Step2_wireframe.mp4" type="video/mp4"> >!
-</video>
-	<video id="customer-closer" width="100%" height="100%" autoplay muted loop>
-	<source src="./Step3_wireframe.mp4" type="video/mp4"> >!
-</video>
-
+<!-- Below iamge shows whenever a customer is detected. -->
+<img id="customer-detected" style="display:none" width="100%" height="100%" src="./resources/Come_closer_Horizontal.jpg">
+<!-- Below image shows whenever a customer come closer to the RADAR. -->
+<img id="customer-closer" style="display:none" width="100%" height="100%" src="./resources/Adverts_Horizontal-Couple.png">
 </body>
 </html>
