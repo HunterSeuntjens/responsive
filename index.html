@@ -8,7 +8,7 @@
 			margin: 0 auto;
 		}
 		.trigger-container {
-			background-color: #00000044;
+			background-color: #000000;
 			color: #FFFFFF;
 			font-size: 25px;
 			font-weight: 900;
@@ -47,15 +47,17 @@
 	  */
 	  let closerDistance = 1;
 
-	  let dRuleId = null;
-	  let cRuleId = null;
+	 /* let dRuleId = null;
+	  let cRuleId = null; */
+		let dRuleId ="6643b6a211cf9c973320d55c";
+	       let cRuleId = "6643b6a211cf9c973320d567";
 
 	  const ruleMap = {};
 
       const handleRuleResult = (ruleResult) => {
 		  const ruleId = ruleResult['RULE_ID'];
 		  if(!ruleId){
-			  retun;
+			  return;
 		  }
 		  if([dRuleId, cRuleId].includes(ruleId)){
 			ruleMap[ruleId] = new Date();
@@ -109,14 +111,14 @@
 		 *  Type of parameter : text
 		 * 	The supplied value will override the variable `mqHost`
 		*/
-
 		if(url.searchParams.get("detection")){
 			detectionDistance = url.searchParams.get("detection");
 		}
 		if(url.searchParams.get("closer")){
 			closerDistance = url.searchParams.get("closer");
 		}
-		if(url.searchParams.get("mqhost")){
+	/*
+	if(url.searchParams.get("mqhost")){
 			mqHost = url.searchParams.get("mqhost");
 		}
 		if(url.searchParams.get("druleid")){
@@ -129,7 +131,10 @@
 		}else{
 			alert('Parameter cruleid is missing in the URL. Please ensure both cruleid and druleid are present in the URL parameters.')
 		}
-
+*/
+	      mqHost=localhost
+	      
+	      
       	const wsMQUrl = `ws://${mqHost}:15674/ws`;
       	const ws = new WebSocket(wsMQUrl);
         const wsClient = Stomp.over(ws);		
