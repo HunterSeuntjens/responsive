@@ -8,7 +8,7 @@
 			margin: 0 auto;
 		}
 		.trigger-container {
-			background-color: #000000;
+			background-color: #00000044;
 			color: #FFFFFF;
 			font-size: 25px;
 			font-weight: 900;
@@ -39,18 +39,17 @@
 	  * In the current scenario we'll show the `Come closer` image.
 	  * If the distance is greater, when we continue playing the looopback video.
 	  */
-	  let detectionDistance = 3;
+	  let detectionDistance = 300;
 	  /*
 	  * Value of these variable determines whether the object is closer or not.
 	  * If the object is below the specified distance, 
 	  * then we start showing the advertisement image (Run Together image).
 	  */
-	  let closerDistance = 1;
+	  let closerDistance = 150;
 
-	 /* let dRuleId = null;
-	  let cRuleId = null; */
-		let dRuleId ="6643b6a211cf9c973320d55c";
-	       let cRuleId = "6643b6a211cf9c973320d567";
+	let dRuleId = "6643b6a211cf9c973320d55c";
+	  let cRuleId = "6643b6a211cf9c973320d567";
+		
 
 	  const ruleMap = {};
 
@@ -91,7 +90,7 @@
       const init = () => {
 
 		var url = new URL(location.href);
-		let mqHost = 'localhost';
+		//let mqHost = '192.168.4.232';
 
 		/*
 		 * We expect 3 parameters in url
@@ -111,14 +110,14 @@
 		 *  Type of parameter : text
 		 * 	The supplied value will override the variable `mqHost`
 		*/
+
 		if(url.searchParams.get("detection")){
 			detectionDistance = url.searchParams.get("detection");
 		}
 		if(url.searchParams.get("closer")){
 			closerDistance = url.searchParams.get("closer");
 		}
-	/*
-	if(url.searchParams.get("mqhost")){
+	/*	if(url.searchParams.get("mqhost")){
 			mqHost = url.searchParams.get("mqhost");
 		}
 		if(url.searchParams.get("druleid")){
@@ -130,11 +129,10 @@
 			cRuleId = url.searchParams.get("cruleid");
 		}else{
 			alert('Parameter cruleid is missing in the URL. Please ensure both cruleid and druleid are present in the URL parameters.')
-		}
-*/
-	      mqHost=localhost
-	      
-	      
+		}*/
+		  let dRuleId = "6643b6a211cf9c973320d55c";
+			  let cRuleId = "6643b6a211cf9c973320d567";
+
       	const wsMQUrl = `ws://${mqHost}:15674/ws`;
       	const ws = new WebSocket(wsMQUrl);
         const wsClient = Stomp.over(ws);		
@@ -154,12 +152,12 @@
                 
               }
             });
-        }; 
+        };
 
         const on_error =  (err) => {
             console.error('error' + err);
         };
-        wsClient.connect(username, password, on_connect, on_error, topic);
+        wsClient.connect(username,password, on_connect, on_error, topic);
 
 		/*
 			* We check for the updates in the object identification status in every one second.
@@ -171,12 +169,15 @@
 </head>
 <body onload="init();">
 	<!-- The below video plays indefenitely if no customer is detected. -->
-<video id="loopback-video" width="100%" height="100%" autoplay muted loop>
-	<source src="./Step1_wireframe.mp4" type="video/mp4">
+ <video id="loopback-video" width="100%" height="100%" autoplay muted loop>
+	<source src="./Step1.mp4" type="video/mp4">
 </video>
-<!-- Below iamge shows whenever a customer is detected. -->
-<img id="customer-detected" style="display:none" width="100%" height="100%" src="./Come_closer_Horizontal.jpg">
-<!-- Below image shows whenever a customer come closer to the RADAR. -->
-<img id="customer-closer" style="display:none" width="100%" height="100%" src="./Adverts_Horizontal-Couple.png">
+	<video id="customer-detected" width="100%" height="100%" autoplay muted loop>
+	<source src="./Step2.mp4" type="video/mp4">
+</video>
+	<video id="customer-closer" width="100%" height="100%" autoplay muted loop>
+	<source src="./Step3.mp4" type="video/mp4">
+</video>
+
 </body>
 </html>
