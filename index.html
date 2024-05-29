@@ -55,7 +55,7 @@
       const handleRuleResult = (ruleResult) => {
 		  const ruleId = ruleResult['RULE_ID'];
 		  if(!ruleId){
-			  retun;
+			  return;
 		  }
 		  if([dRuleId, cRuleId].includes(ruleId)){
 			ruleMap[ruleId] = new Date();
