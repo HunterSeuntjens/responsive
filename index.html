@@ -67,7 +67,7 @@
 		const now = new Date();
 		if(ruleMap[cRuleId]){
 			const lastCTime = ruleMap[cRuleId];
-			if(Math.abs(now - lastCTime) < 3000){
+			if(Math.abs(now - lastCTime) < 300){
 				$('loopback-video').style.display = 'none';
 				$('customer-detected').style.display = 'none';
 				$('customer-closer').style.display = 'block';
@@ -76,7 +76,7 @@
 		}
 		if(ruleMap[dRuleId]){
 			const lastDTime = ruleMap[dRuleId];
-			if(Math.abs(now - lastDTime) < 3000){
+			if(Math.abs(now - lastDTime) < 300){
 				$('loopback-video').style.display = 'none';
 				$('customer-detected').style.display = 'block';
 				$('customer-closer').style.display = 'none';
@@ -112,12 +112,12 @@
 		 * 	The supplied value will override the variable `mqHost`
 		*/
 
-		if(url.searchParams.get("detection")){
+		/*if(url.searchParams.get("detection")){
 			detectionDistance = url.searchParams.get("detection");
 		}
 		if(url.searchParams.get("closer")){
 			closerDistance = url.searchParams.get("closer");
-		}
+		}*/
 	/*	if(url.searchParams.get("mqhost")){
 			mqHost = url.searchParams.get("mqhost");
 		}
@@ -131,9 +131,9 @@
 		}else{
 			alert('Parameter cruleid is missing in the URL. Please ensure both cruleid and druleid are present in the URL parameters.')
 		}*/
-		  let dRuleId = "6643b6a211cf9c973320d55c";
+		/*  let dRuleId = "6643b6a211cf9c973320d55c";
 			  let cRuleId = "6643b6a211cf9c973320d567";
-
+*/
       	const wsMQUrl = `ws://${mqHost}:15674/ws`;
       	const ws = new WebSocket(wsMQUrl);
         const wsClient = Stomp.over(ws);		
