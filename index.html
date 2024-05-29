@@ -36,7 +36,7 @@
 	  * If the object is below maximum distance, 
 	  * then only we consider the distance for further calculations.
 	  * Otherwise we neglect the obejct as not-detected.
-	  * In the current scenario we'll show the `Come closer` image.
+	  * In the current scenario we'll show the 'Come closer' image.
 	  * If the distance is greater, when we continue playing the looopback video.
 	  */
 	  let detectionDistance = 5;
@@ -99,25 +99,25 @@
 		 * Parameter 1 : 
 		 *	Name of parameter : detection
 		 *  Type of parameter : number
-		 * 	The supplied value will override the variable `detectionDistance`
+		 * 	The supplied value will override the variable 'detectionDistance'
 		 *
 		 * Parameter 2 : 
 		 *	Name of parameter : closer
 		 *  Type of parameter : number
-		 * 	The supplied value will override the variable `closerDistance`
+		 * 	The supplied value will override the variable 'closerDistance'
 		 *
 		 * Parameter 3 : 
 		 *	Name of parameter : mqhost
 		 *  Type of parameter : text
-		 * 	The supplied value will override the variable `mqHost`
+		 * 	The supplied value will override the variable 'mqHost'
 		*/
 
-		/*if(url.searchParams.get("detection")){
+		if(url.searchParams.get("detection")){
 			detectionDistance = url.searchParams.get("detection");
 		}
 		if(url.searchParams.get("closer")){
 			closerDistance = url.searchParams.get("closer");
-		}*/
+		}
 	/*	if(url.searchParams.get("mqhost")){
 			mqHost = url.searchParams.get("mqhost");
 		}
@@ -134,7 +134,7 @@
 		/*  let dRuleId = "6643b6a211cf9c973320d55c";
 			  let cRuleId = "6643b6a211cf9c973320d567";
 */
-      	const wsMQUrl = `ws://${mqHost}:15674/ws`;
+      	const wsMQUrl = 'ws://${mqHost}:15674/ws';
       	const ws = new WebSocket(wsMQUrl);
         const wsClient = Stomp.over(ws);		
         wsClient.debug = () => {};
@@ -145,8 +145,9 @@
 		const channel = 'event.outputs'
 
         const on_connect = () => {
-	    	console.log(`connection success ${topic}`);
-	    	wsClient.subscribe(`/exchange/${channel}`, (message) => {
+	    	console.log('connection success ${topic}');
+		const temp = 'Connection success';
+	    	wsClient.subscribe('/exchange/${channel}', (message) => {
               try {
                 handleRuleResult(JSON.parse(message.body));
               } catch (error) {
@@ -172,6 +173,7 @@
 	<!-- The below video plays indefenitely if no customer is detected. -->
  <video id="loopback-video" width="100%" height="100%" autoplay muted loop>
 	<source src="./Step1.mp4" type="video/mp4">
+	 <p id="temp"> </p>
 </video>
 	<video id="customer-detected" width="100%" height="100%" autoplay muted loop>
 	<source src="./Step2.mp4" type="video/mp4">
