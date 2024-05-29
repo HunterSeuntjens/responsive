@@ -85,9 +85,12 @@
 		}
 		$('loopback-video').style.display = 'block';
 		$('customer-detected').style.visibility = 'hidden';
-		/*$('customer-closer').style.visibility = 'hidden';*/
-		  document.getElementByID('customer-closer').style.visibility = 'none';
+		$('customer-closer').style.visibility = 'hidden';
+		 
 	  };
+		$('loopback-video').style.display = 'block';
+		$('customer-detected').style.visibility = 'hidden';
+		$('customer-closer').style.visibility = 'hidden';
       const init = () => {
 
 		var url = new URL(location.href);
