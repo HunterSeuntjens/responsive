@@ -85,7 +85,8 @@
 		}
 		$('loopback-video').style.display = 'block';
 		$('customer-detected').style.visibility = 'hidden';
-		$('customer-closer').style.visibility = 'hidden';
+		/*$('customer-closer').style.visibility = 'hidden';*/
+		  document.getElementByID('customer-closer').style.visibility = 'none';
 	  };
       const init = () => {
 
