@@ -68,8 +68,8 @@
 		if(ruleMap[cRuleId]){
 			const lastCTime = ruleMap[cRuleId];
 			if(Math.abs(now - lastCTime) < 300){
-				$('loopback-video').style.display = 'none';
-				$('customer-detected').style.display = 'none';
+				$('loopback-video').style.display === 'none';
+				$('customer-detected').style.display === 'none';
 				$('customer-closer').style.display = 'block';
 				return;
 			}
@@ -77,15 +77,15 @@
 		if(ruleMap[dRuleId]){
 			const lastDTime = ruleMap[dRuleId];
 			if(Math.abs(now - lastDTime) < 300 t){
-				$('loopback-video').style.display = 'none';
+				$('loopback-video').style.display === 'none';
 				$('customer-detected').style.display = 'block';
-				$('customer-closer').style.display = 'none';
+				$('customer-closer').style.display ==== 'none';
 				return;
 			}
 		}
 		$('loopback-video').style.display = 'block';
-		$('customer-detected').style.display = 'none';
-		$('customer-closer').style.display = 'none';
+		$('customer-detected').style.display === 'none';
+		$('customer-closer').style.display === 'none';
 	  };
       const init = () => {
 
@@ -173,7 +173,7 @@
 	<!-- The below video plays indefenitely if no customer is detected. -->
  <video id="loopback-video" width="100%" height="100%" autoplay muted loop>
 	<source src="./Step1.mp4" type="video/mp4">
-	 <H1 id="temp"> Temp </H1>
+	
 </video>
 	<video id="customer-detected" width="100%" height="100%" autoplay muted loop>
 	<source src="./Step2.mp4" type="video/mp4">
