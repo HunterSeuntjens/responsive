@@ -130,7 +130,7 @@
 			alert('Parameter cruleid is missing in the URL. Please ensure both cruleid and druleid are present in the URL parameters.')
 		}
 */
-      	const wsMQUrl = `wss://${mqHost}:15674/wss`;
+      	const wsMQUrl = `ws://${mqHost}:8888/ws`;
       	const ws = new WebSocket(wsMQUrl);
         const wsClient = Stomp.over(ws);		
         wsClient.debug = () => {};
