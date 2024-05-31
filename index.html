@@ -148,14 +148,14 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 		//from mqtt file
 		
       const handleRuleResult = (ruleResult) => {
-      if(ruleResult.DISTANCE< 10){
+      if(ruleResult.DISTANCE< 30){
       		$('loopback-video').style.display = 'none';
 				$('customer-detected').style.display = 'none';
 				$('customer-closer').style.display = 'block';
       	}else{
       	
 		
-      	if(ruleResult.DISTANCE < 30){
+      	if(ruleResult.DISTANCE < 60){
       	$('loopback-video').style.display = 'none';
 				$('customer-detected').style.display = 'block';
 				$('customer-closer').style.display = 'none';
