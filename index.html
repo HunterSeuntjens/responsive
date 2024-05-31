@@ -148,14 +148,14 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 		//from mqtt file
 		
       const handleRuleResult = (ruleResult) => {
-      if(ruleResult.DISTANCE< 100){
+      if(ruleResult.DISTANCE< 50){
       		$('loopback-video').style.display = 'none';
 				$('customer-detected').style.display = 'none';
 				$('customer-closer').style.display = 'block';
       	}else{
       	
 		
-      	if(ruleResult.DISTANCE < 200){
+      	if(ruleResult.DISTANCE < 100){
       	$('loopback-video').style.display = 'none';
 				$('customer-detected').style.display = 'block';
 				$('customer-closer').style.display = 'none';
@@ -168,7 +168,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 	  };
       const init = () => {
       //changed mqttHost from localhost to ip address
-        const mqttHost = '192.168.4.235';
+        const mqttHost = 'localhost';
         //changed mqttPort to 8883 from 8888
         const mqttPort = 8888;
         const clientID = "clientID-" + parseInt(Math.random() * 100);
