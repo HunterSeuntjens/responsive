@@ -106,13 +106,13 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 	  * In the current scenario we'll show the `Come closer` image.
 	  * If the distance is greater, when we continue playing the looopback video.
 	  */
-	  let detectionDistance = 30;
+	  let detectionDistance = 305;
 	  /*
 	  * Value of these variable determines whether the object is closer or not.
 	  * If the object is below the specified distance, 
 	  * then we start showing the advertisement image (Run Together image).
 	  */
-	  let closerDistance = 10;
+	  let closerDistance = 154;
 
 	 let dRuleId = "6643b6a211cf9c973320d55c";
 	  let cRuleId = "6643b6a211cf9c973320d567";
@@ -198,7 +198,7 @@ message.errorMessage);
 },
 userName: username,
 password: password});
-		setInterval(refreshAdvertisement, 10000);
+		setInterval(refreshAdvertisement, 8000);
 
 };
 </script>
