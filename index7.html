@@ -155,7 +155,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 	  };
       const init = () => {
       //changed mqttHost from localhost to ip address
-        const mqttHost = 'localhost';
+        const mqttHost = '192.168.4.235';
         //changed mqttPort to 8883 from 8888
         const mqttPort = 8888;
         const clientID = "clientID-" + parseInt(Math.random() * 100);
