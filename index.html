@@ -133,7 +133,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 		const now = new Date();
 		if(ruleMap[cRuleId]){
 			const lastCTime = ruleMap[cRuleId];
-			if(Math.abs(now - lastCTime) < 1000){
+			if(Math.abs(now - lastCTime) < 3000){
 				$('loopback-video').style.display = 'none';
 				$('customer-detected').style.display = 'none';
 				$('customer-closer').style.display = 'block';
@@ -142,7 +142,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 		}
 		if(ruleMap[dRuleId]){
 			const lastDTime = ruleMap[dRuleId];
-			if(Math.abs(now - lastDTime) < 1000){
+			if(Math.abs(now - lastDTime) < 3000){
 				$('loopback-video').style.display = 'none';
 				$('customer-detected').style.display = 'block';
 				$('customer-closer').style.display = 'none';
@@ -198,7 +198,7 @@ message.errorMessage);
 },
 userName: username,
 password: password});
-		setInterval(refreshAdvertisement, 1000);
+		setInterval(refreshAdvertisement, 1500);
 
 };
 </script>
