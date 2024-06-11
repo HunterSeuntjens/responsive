@@ -116,6 +116,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 
 	 let dRuleId = "6643b6a211cf9c973320d55c";
 	  let cRuleId = "6643b6a211cf9c973320d567";
+		let tRuleId= "6668c59b81efcc23a4d5f1b8"
 
 	  const ruleMap = {};
 
@@ -149,9 +150,16 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 				return;
 			}
 		}
-		$('loopback-video').style.display = 'block';
+		  	if(ruleMap[tRuleId]){
+			const lastTTime = ruleMap[dRuleId];
+			if(Math.abs(now - lastTTime) < 3000){
+			$('loopback-video').style.display = 'block';
 		$('customer-detected').style.display = 'none';
 		$('customer-closer').style.display = 'none';
+				return;
+			}
+		}
+		
 	  };
       const init = () => {
       //changed mqttHost from localhost to ip address
