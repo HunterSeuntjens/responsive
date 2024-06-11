@@ -161,6 +161,13 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 		}
 		
 	  };
+		const timeOut = () =>{
+
+	$('loopback-video').style.display = 'block';
+		$('customer-detected').style.display = 'none';
+		$('customer-closer').style.display = 'none';
+			
+		};
       const init = () => {
       //changed mqttHost from localhost to ip address
         const mqttHost = 'localhost';
@@ -207,6 +214,8 @@ message.errorMessage);
 userName: username,
 password: password});
 		setInterval(refreshAdvertisement, 3000);
+	      		setInterval(timeOut, 30000);
+
 
 };
 </script>
