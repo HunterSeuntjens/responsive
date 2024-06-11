@@ -151,7 +151,7 @@ set qos(a){this._setQos(a)},get retained(){return this._getRetained()},set retai
 			}
 		}
 		  	if(ruleMap[tRuleId]){
-			const lastTTime = ruleMap[dRuleId];
+			const lastTTime = ruleMap[tRuleId];
 			if(Math.abs(now - lastTTime) < 3000){
 			$('loopback-video').style.display = 'block';
 		$('customer-detected').style.display = 'none';
