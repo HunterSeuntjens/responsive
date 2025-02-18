@@ -1,0 +1,45 @@
+const icsURLs = [
+"https://outlook.office365.com/owa/calendar/068eb7fe1f74477ab9d4b79155ff0b9e@swbr.com/26bff76eb4cf4bc1b7ea2b2bc087c2e01101030450086443816/calendar.ics",
+  "https://outlook.office365.com/owa/calendar/068eb7fe1f74477ab9d4b79155ff0b9e@swbr.com/0358ea997ee241898be64e50f19800859985725889804456370/calendar.ics",
+"https://outlook.office365.com/owa/calendar/068eb7fe1f74477ab9d4b79155ff0b9e@swbr.com/d51873fd2fb941d5b01773b98f02062d14710376022388682005/calendar.ics"
+  
+];
+
+combineICS(icsURLs)
+  .then(combinedData => {
+    //Handle the combined ICS data, for example, by downloading it
+    console.log(combinedData);
+  })
+  .catch(error => {
+    console.error("Error combining ICS files:", error);
+  });
+
+async function combineICS(urls) {
+  let combinedICSData = "BEGIN:VCALENDAR\nVERSION:2.0\n";
+
+  for (const url of urls) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ICS data from ${url}: ${response.status} ${response.statusText}`);
+      }
+      const icsData = await response.text();
+      // Extract events and add them to the combined data
+      const events = icsData.split("BEGIN:VEVENT");
+      for (let i = 1; i < events.length; i++) {
+        combinedICSData += "BEGIN:VEVENT" + events[i];
+      }
+    } catch (error) {
+      console.error("Error processing ICS file:", error);
+    }
+  }
+
+  combinedICSData += "END:VCALENDAR";
+//  return combinedICSData;
+//}
+
+
+ //function createAddToCalendarLink(combinedICSData) {
+      const encodedIcs = encodeURIComponent(combinedICSData);
+      return `data:text/calendar;charset=utf8,${encodedIcs}`;
+    }
