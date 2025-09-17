@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            overflow: hidden;
+        }
+
+        #iframe-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #fff;
+        }
+
+        #url-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            max-width: 300px;
+            word-break: break-all;
+        }
+
+        #error-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(139, 0, 0, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            max-width: 400px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        #error-overlay h4 {
+            margin: 0 0 10px 0;
+            color: #ff6b6b;
+            font-size: 14px;
+        }
+
+        .load-time {
+            color: #90EE90;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 5px;
+        }
+
+        .error-item {
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid #ff6b6b;
+            word-break: break-word;
+        }
+
+        .error-type {
+            font-weight: bold;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .error-time {
+            color: #ccc;
+            font-size: 10px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="iframe-container">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading website...
+        </div>
+        <iframe id="website-iframe" style="display: none;"></iframe>
+        <div id="url-overlay"></div>
+        <div id="error-overlay">
+            <div class="load-time" id="load-time-display"></div>
+            <h4>JavaScript Errors</h4>
+            <div id="error-list"></div>
+        </div>
+    </div>
+
+    <script>
+        class WebsiteViewer {
+            constructor() {
+                this.currentIndex = 0;
+                this.errors = [];
+                this.loadStartTime = null;
+                this.iframe = document.getElementById('website-iframe');
+                this.urlOverlay = document.getElementById('url-overlay');
+                this.errorOverlay = document.getElementById('error-overlay');
+                this.errorList = document.getElementById('error-list');
+                this.loadTimeDisplay = document.getElementById('load-time-display');
+                this.loading = document.querySelector('.loading');
+                
+                // Check URL parameter for JavaScript overlay visibility
+                const urlParams = new URLSearchParams(window.location.search);
+                this.showJsOverlay = urlParams.get('jsOverlay') !== 'false';
+                
+                // List of websites to display
+                this.websites = [
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=TRUE&fontfamily=Inter&hideintro=FALSE',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=TRUE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=TRUE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=TRUE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=TRUE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=TRUE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=TRUE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=TRUE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Inter',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=transparent&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=solid&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=solid&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=solid&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=solid&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=solid&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=solid&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=solid&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=solid&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=gradient&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=gradient&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=gradient&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=gradient&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=gradient&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=gradient&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=gradient&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+'http://kitchen.screenfeed.com/feed/x4s0d2rhxqyf4sqy19nrh5y20.html?_htmlBranch=united&accentTextColor=lightblue&accentColor=darkblue&backgroundtype=gradient&secondaryaccentcolor=green&animate=FALSE&fontfamily=Englebert',
+
+                ];
+                
+                this.init();
+            }
+
+            init() {
+                this.setupErrorLogging();
+                this.loadWebsite();
+                this.setupAutoRotation();
+                this.setupKeyboardNavigation();
+            }
+
+            setupErrorLogging() {
+                // Override console methods to capture all console output
+                this.originalConsole = {
+                    log: console.log,
+                    error: console.error,
+                    warn: console.warn,
+                    info: console.info,
+                    debug: console.debug
+                };
+
+                // Intercept console.error
+                console.error = (...args) => {
+                    this.logError('ERROR', args.join(' '), '#ff6b6b');
+                    this.originalConsole.error.apply(console, args);
+                };
+
+                // Intercept console.warn
+                console.warn = (...args) => {
+                    this.logError('WARN', args.join(' '), '#ffa500');
+                    this.originalConsole.warn.apply(console, args);
+                };
+
+                // Intercept console.log for reference (optional - can be disabled)
+                console.log = (...args) => {
+                    // Uncomment next line if you want to capture console.log too
+                    // this.logError('LOG', args.join(' '), '#90EE90');
+                    this.originalConsole.log.apply(console, args);
+                };
+
+                // Intercept console.info
+                console.info = (...args) => {
+                    this.logError('INFO', args.join(' '), '#87CEEB');
+                    this.originalConsole.info.apply(console, args);
+                };
+
+                // Capture global JavaScript errors
+                window.addEventListener('error', (e) => {
+                    const errorMsg = `${e.message}`;
+                    const location = e.filename ? ` at ${e.filename}:${e.lineno}:${e.colno}` : '';
+                    this.logError('SCRIPT ERROR', errorMsg + location, '#ff4757');
+                });
+
+                // Capture unhandled promise rejections
+                window.addEventListener('unhandledrejection', (e) => {
+                    let reason = e.reason;
+                    if (reason instanceof Error) {
+                        reason = `${reason.name}: ${reason.message}`;
+                        if (reason.stack) {
+                            const stackLine = reason.stack.split('\n')[1];
+                            if (stackLine) {
+                                reason += ` ${stackLine.trim()}`;
+                            }
+                        }
+                    }
+                    this.logError('UNHANDLED PROMISE', reason, '#ff3838');
+                });
+
+                // Capture network errors and failed requests
+                const originalFetch = window.fetch;
+                window.fetch = async (...args) => {
+                    try {
+                        const response = await originalFetch.apply(window, args);
+                        if (!response.ok) {
+                            this.logError('FETCH ERROR', `${response.status} ${response.statusText} - ${args[0]}`, '#ff6348');
+                        }
+                        return response;
+                    } catch (error) {
+                        this.logError('NETWORK ERROR', `Fetch failed: ${error.message} - ${args[0]}`, '#ff4757');
+                        throw error;
+                    }
+                };
+
+                // Monitor iframe errors (limited due to cross-origin restrictions)
+                this.iframe.addEventListener('load', () => {
+                    try {
+                        // This will only work for same-origin iframes
+                        const iframeWindow = this.iframe.contentWindow;
+                        if (iframeWindow) {
+                            // Try to inject error logging into iframe
+                            iframeWindow.addEventListener('error', (e) => {
+                                this.logError('IFRAME ERROR', `${e.message} at ${e.filename}:${e.lineno}`, '#ff6b6b');
+                            });
+                            
+                            // Override iframe console methods if possible
+                            if (iframeWindow.console) {
+                                const originalIframeError = iframeWindow.console.error;
+                                iframeWindow.console.error = (...args) => {
+                                    this.logError('IFRAME CONSOLE ERROR', args.join(' '), '#ff4757');
+                                    originalIframeError.apply(iframeWindow.console, args);
+                                };
+                            }
+                        }
+                    } catch (e) {
+                        // Cross-origin restriction - expected for external sites
+                        // this.logError('CROSS-ORIGIN', 'Cannot access iframe content due to CORS policy', '#ffa500');
+                    }
+                });
+
+                // Capture resource loading errors
+                window.addEventListener('error', (e) => {
+                    if (e.target !== window) {
+                        const tagName = e.target.tagName;
+                        const source = e.target.src || e.target.href;
+                        if (source) {
+                            this.logError('RESOURCE ERROR', `Failed to load ${tagName}: ${source}`, '#ff6348');
+                        }
+                    }
+                }, true);
+            }
+
+            logError(type, errorMessage, color = '#ff6b6b') {
+                const timestamp = new Date().toLocaleTimeString();
+                const error = {
+                    type: type,
+                    message: errorMessage,
+                    time: timestamp,
+                    color: color
+                };
+                
+                this.errors.push(error);
+                this.updateErrorDisplay();
+                
+                // Keep only last 15 errors
+                if (this.errors.length > 15) {
+                    this.errors.shift();
+                }
+            }
+
+            updateErrorDisplay() {
+                if (!this.showJsOverlay) {
+                    this.errorOverlay.style.display = 'none';
+                    return;
+                }
+
+                if (this.errors.length === 0 && !this.loadStartTime) {
+                    this.errorOverlay.style.display = 'none';
+                    return;
+                }
+
+                this.errorOverlay.style.display = 'block';
+                this.errorList.innerHTML = this.errors.map(error => `
+                    <div class="error-item" style="border-left-color: ${error.color}">
+                        <div class="error-type" style="color: ${error.color}">${error.type}</div>
+                        <div>${error.message}</div>
+                        <div class="error-time">${error.time}</div>
+                    </div>
+                `).join('');
+            }
+
+            loadWebsite() {
+                const url = this.websites[this.currentIndex];
+                this.urlOverlay.textContent = url;
+                this.loadStartTime = performance.now();
+                
+                this.loading.style.display = 'flex';
+                this.iframe.style.display = 'none';
+
+                this.iframe.onload = () => {
+                    const loadTime = ((performance.now() - this.loadStartTime) / 1000).toFixed(2);
+                    this.updateLoadTimeDisplay(loadTime);
+                    this.loading.style.display = 'none';
+                    this.iframe.style.display = 'block';
+                };
+
+                this.iframe.onerror = () => {
+                    const loadTime = ((performance.now() - this.loadStartTime) / 1000).toFixed(2);
+                    this.updateLoadTimeDisplay(loadTime);
+                    this.logError('LOAD ERROR', `Failed to load: ${url}`, '#ff4757');
+                    this.loading.style.display = 'none';
+                    this.iframe.style.display = 'block';
+                };
+
+                this.iframe.src = url;
+            }
+
+            updateLoadTimeDisplay(loadTime) {
+                if (this.showJsOverlay) {
+                    this.loadTimeDisplay.textContent = `Load Time: ${loadTime}s`;
+                    this.updateErrorDisplay(); // Refresh overlay display
+                }
+            }
+
+            nextWebsite() {
+                this.currentIndex = (this.currentIndex + 1) % this.websites.length;
+                this.loadWebsite();
+            }
+
+            previousWebsite() {
+                this.currentIndex = (this.currentIndex - 1 + this.websites.length) % this.websites.length;
+                this.loadWebsite();
+            }
+
+            setupAutoRotation() {
+                // Auto-rotate every 30 seconds
+                setInterval(() => {
+                    this.nextWebsite();
+                }, 30000);
+            }
+
+            setupKeyboardNavigation() {
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key) {
+                        case 'ArrowRight':
+                        case ' ':
+                            e.preventDefault();
+                            this.nextWebsite();
+                            break;
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            this.previousWebsite();
+                            break;
+                        case 'r':
+                        case 'R':
+                            e.preventDefault();
+                            this.loadWebsite(); // Refresh current site
+                            break;
+                        case 'c':
+                        case 'C':
+                            e.preventDefault();
+                            this.clearErrors();
+                            break;
+                    }
+                });
+            }
+
+            clearErrors() {
+                this.errors = [];
+                this.loadStartTime = null;
+                this.loadTimeDisplay.textContent = '';
+                this.updateErrorDisplay();
+            }
+
+            // Method to add custom websites
+            addWebsite(url) {
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://' + url;
+                }
+                this.websites.push(url);
+            }
+
+            // Method to remove website
+            removeWebsite(index) {
+                if (index >= 0 && index < this.websites.length) {
+                    this.websites.splice(index, 1);
+                    if (this.currentIndex >= this.websites.length) {
+                        this.currentIndex = 0;
+                    }
+                    this.loadWebsite();
+                }
+            }
+        }
+
+        // Initialize the viewer when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.viewer = new WebsiteViewer();
+            
+
+        });
+
+        // Console methods for interaction
+        console.log(`
+        Website Viewer Controls:
+        - Arrow Right / Space: Next website
+        - Arrow Left: Previous website  
+        - R: Refresh current website
+        - C: Clear error log
+        
+        URL Parameters:
+        - jsOverlay=false : Hide the JavaScript overlay (default: true)
+        
+        JavaScript API:
+        - viewer.addWebsite(url) - Add a website to rotation
+        - viewer.removeWebsite(index) - Remove website by index
+        - viewer.nextWebsite() - Go to next website
+        - viewer.previousWebsite() - Go to previous website
+        - viewer.clearErrors() - Clear error log
+        `);
+    </script>
+</body>
+</html>
