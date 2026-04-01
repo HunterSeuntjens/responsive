@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Counter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0f0f0f;
+      font-family: 'Courier New', monospace;
+      color: #fff;
+    }
+
+    .label {
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
+    .counter {
+      font-size: clamp(5rem, 20vw, 12rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: #fff;
+      transition: color 0.2s;
+      min-width: 4ch;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 3rem;
+    }
+
+    button {
+      padding: 0.6rem 1.6rem;
+      border: 1px solid #333;
+      border-radius: 6px;
+      background: transparent;
+      color: #888;
+      font-family: inherit;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    button:hover {
+      border-color: #fff;
+      color: #fff;
+    }
+
+    button.active {
+      background: #fff;
+      color: #000;
+      border-color: #fff;
+    }
+
+    .speed {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .speed span {
+      font-size: 0.75rem;
+      color: #444;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .speed-btn {
+      padding: 0.3rem 0.8rem;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="label">Counting since page load</div>
+  <div class="counter" id="counter">0</div>
+
+  <div class="controls">
+    <button id="toggleBtn" class="active" onclick="toggle()">Pause</button>
+    <button onclick="reset()">Reset</button>
+  </div>
+
+  <div class="speed">
+    <span>Speed:</span>
+    <button class="speed-btn active" onclick="setSpeed(1000, this)">1×</button>
+    <button class="speed-btn" onclick="setSpeed(100, this)">10×</button>
+    <button class="speed-btn" onclick="setSpeed(10, this)">100×</button>
+  </div>
+
+  <script>
+    let count = 0;
+    let interval;
+    let running = true;
+    let speed = 1000;
+
+    const display = document.getElementById('counter');
+    const toggleBtn = document.getElementById('toggleBtn');
+
+    function tick() {
+      display.textContent = count++;
+    }
+
+    function start() {
+      interval = setInterval(tick, speed);
+    }
+
+    function toggle() {
+      if (running) {
+        clearInterval(interval);
+        toggleBtn.textContent = 'Resume';
+        toggleBtn.classList.remove('active');
+      } else {
+        start();
+        toggleBtn.textContent = 'Pause';
+        toggleBtn.classList.add('active');
+      }
+      running = !running;
+    }
+
+    function reset() {
+      count = 0;
+      display.textContent = '0';
+    }
+
+    function setSpeed(ms, btn) {
+      speed = ms;
+      document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (running) {
+        clearInterval(interval);
+        start();
+      }
+    }
+
+    start();
+  </script>
+
+</body>
+</html>
